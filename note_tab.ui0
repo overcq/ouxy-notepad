@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkGrid" id="Q_builder_Z_note_tab_container">
+    <property name="column-spacing">2</property>
+    <property name="row-spacing">2</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <child>
+          <object class="GtkTreeView" id="Q_builder_Z_books_tree">
+            <property name="enable-tree-lines">TRUE</property>
+            <property name="expand">TRUE</property>
+            <property name="has-tooltip">TRUE</property>
+            <signal name="button-release-event" handler="E_note_tab_Q_tree_Z_gtk_X_button_release_event"/>
+<!--
+            <signal name="drag-begin" handler="E_note_tab_Q_tree_Z_gtk_X_drag_begin"/>
+            <signal name="drag-end" handler="E_note_tab_Q_tree_Z_gtk_X_drag_end"/>
+-->
+            <signal name="focus-in-event" handler="E_note_tab_Q_tree_Z_gtk_X_focus_in_event"/>
+            <signal name="focus-out-event" handler="E_note_tab_Q_tree_Z_gtk_X_focus_out_event"/>
+            <signal name="query-tooltip" handler="E_note_tab_Q_tree_Z_gtk_X_query_tooltip"/>
+            <signal name="row-expanded" handler="E_note_tab_Q_tree_Z_gtk_X_row_expanded"/>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="sizing">GTK_TREE_VIEW_COLUMN_AUTOSIZE</property>
+                <property name="title">books</property>
+                <child>
+                  <object class="GtkCellRendererText" id="Q_builder_Z_books_tree_renderer_text">
+                    <property name="editable">TRUE</property>
+                    <property name="ellipsize">PANGO_ELLIPSIZE_END</property>
+                    <property name="placeholder-text">[no title]</property>
+                    <property name="single-paragraph-mode">TRUE</property>
+                    <signal name="editing-canceled" handler="E_note_tab_Q_books_tree_Q_branch_Z_gtk_X_editing_canceled"/>
+                    <signal name="edited" handler="E_note_tab_Q_books_tree_Q_branch_Z_gtk_X_edited"/>
+                  </object>
+                  <attributes>
+                    <attribute name="text">0</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+            <child internal-child="selection">
+              <object class="GtkTreeSelection">
+                <signal name="changed" handler="E_note_tab_Q_books_tree_Z_gtk_X_selection_changed"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="top-attach">0</property>
+        <property name="height">4</property>
+        <property name="left-attach">0</property>
+        <property name="width">14</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScrolledWindow">
+        <child>
+          <object class="GtkTreeView" id="Q_builder_Z_notes_tree">
+            <property name="can-focus">FALSE</property>
+            <property name="enable-tree-lines">TRUE</property>
+            <property name="expand">TRUE</property>
+            <property name="has-tooltip">TRUE</property>
+            <signal name="button-release-event" handler="E_note_tab_Q_tree_Z_gtk_X_button_release_event"/>
+<!--
+            <signal name="drag-begin" handler="E_note_tab_Q_tree_Z_gtk_X_drag_begin"/>
+            <signal name="drag-end" handler="E_note_tab_Q_tree_Z_gtk_X_drag_end"/>
+-->
+            <signal name="focus-in-event" handler="E_note_tab_Q_tree_Z_gtk_X_focus_in_event"/>
+            <signal name="focus-out-event" handler="E_note_tab_Q_tree_Z_gtk_X_focus_out_event"/>
+            <signal name="query-tooltip" handler="E_note_tab_Q_tree_Z_gtk_X_query_tooltip"/>
+            <signal name="row-expanded" handler="E_note_tab_Q_tree_Z_gtk_X_row_expanded"/>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="sizing">GTK_TREE_VIEW_COLUMN_AUTOSIZE</property>
+                <property name="title">notes</property>
+                <child>
+                  <object class="GtkCellRendererText" id="Q_builder_Z_notes_tree_renderer_text">
+                    <property name="editable">TRUE</property>
+                    <property name="ellipsize">PANGO_ELLIPSIZE_END</property>
+                    <property name="placeholder-text">[no title]</property>
+                    <property name="single-paragraph-mode">TRUE</property>
+                    <signal name="editing-canceled" handler="E_note_tab_Q_notes_tree_Q_branch_Z_gtk_X_editing_canceled"/>
+                    <signal name="edited" handler="E_note_tab_Q_notes_tree_Q_branch_Z_gtk_X_edited"/>
+                  </object>
+                  <attributes>
+                    <attribute name="text">0</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+            <child internal-child="selection">
+              <object class="GtkTreeSelection">
+                <signal name="changed" handler="E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="top-attach">0</property>
+        <property name="height">4</property>
+        <property name="left-attach">14</property>
+        <property name="width">58</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="hexpand">TRUE</property>
+        <property name="margin-start">1</property>
+        <property name="margin-end">3</property>
+        <child>
+          <object class="GtkTreeView" id="Q_builder_Z_new_tab_names">
+            <property name="enable-search">FALSE</property>
+            <property name="headers-clickable">FALSE</property>
+            <property name="reorderable">TRUE</property>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="sizing">GTK_TREE_VIEW_COLUMN_AUTOSIZE</property>
+                <property name="title">names for new tabs</property>
+                <child>
+                  <object class="GtkCellRendererText">
+                    <property name="editable">TRUE</property>
+                    <property name="placeholder-text">[no tab]</property>
+                    <property name="single-paragraph-mode">TRUE</property>
+                    <signal name="edited" handler="E_note_tab_Q_new_tab_names_Q_branch_Z_gtk_X_edited"/>
+                  </object>
+                  <attributes>
+                    <attribute name="text">0</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left-attach">72</property>
+        <property name="top-attach">0</property>
+        <property name="width">28</property>
+        <property name="height">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkBox" id="Q_builder_Z_search">
+        <property name="margin-start">1</property>
+        <property name="margin-end">2</property>
+        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+        <property name="spacing">2</property>
+        <child>
+          <object class="GtkEntry" id="Q_builder_Z_search_inexact">
+            <property name="activates-default">TRUE</property>
+            <property name="has-frame">FALSE</property>
+            <property name="input-hints">GTK_INPUT_HINT_NO_SPELLCHECK</property>
+            <property name="margin-end">1</property>
+            <property name="placeholder-text">inexact words</property>
+            <property name="secondary-icon-name">gtk-clear</property>
+            <signal name="changed" handler="E_note_tab_Q_search_Z_gtk_X_changed"/>
+            <signal name="focus-in-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_in_event"/>
+            <signal name="focus-out-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_out_event"/>
+            <signal name="icon-press" handler="E_search_Q_search_entry_Z_gtk_X_icon_press"/>
+          </object>
+        </child>
+        <child>
+          <object class="GtkEntry" id="Q_builder_Z_search_exact">
+            <property name="activates-default">TRUE</property>
+            <property name="has-frame">FALSE</property>
+            <property name="input-hints">GTK_INPUT_HINT_NO_SPELLCHECK</property>
+            <property name="margin-end">1</property>
+            <property name="placeholder-text">exact words</property>
+            <property name="secondary-icon-name">gtk-clear</property>
+            <signal name="changed" handler="E_note_tab_Q_search_Z_gtk_X_changed"/>
+            <signal name="focus-in-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_in_event"/>
+            <signal name="focus-out-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_out_event"/>
+            <signal name="icon-press" handler="E_search_Q_search_entry_Z_gtk_X_icon_press"/>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButtonBox">
+            <property name="layout-style">GTK_BUTTONBOX_END</property>
+            <property name="margin-top">1</property>
+            <property name="margin-bottom">1</property>
+            <child>
+              <object class="GtkButton">
+                <property name="focus-on-click">FALSE</property>
+                <property name="label">f_ork new tabs</property>
+                <property name="use-underline">TRUE</property>
+                <signal name="clicked" handler="E_note_tab_Q_new_tab_names_Z_gtk_I_fork_tabs"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="focus-on-click">FALSE</property>
+                <property name="label">_fork tab</property>
+                <property name="use-underline">TRUE</property>
+                <signal name="clicked" handler="E_note_tab_Q_note_tab_Z_gtk_I_fork"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="Q_builder_Z_search_previous">
+                <property name="can-default">TRUE</property>
+                <property name="label">search/p_revious</property>
+                <property name="use-underline">TRUE</property>
+                <signal name="clicked" handler="E_search_Q_note_tab_Z_gtk_I_search_previous"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="Q_builder_Z_search_next">
+                <property name="can-default">TRUE</property>
+                <property name="label">search/n_ext</property>
+                <property name="use-underline">TRUE</property>
+                <signal name="clicked" handler="E_search_Q_note_tab_Z_gtk_I_search_next"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left-attach">72</property>
+        <property name="top-attach">1</property>
+        <property name="width">28</property>
+        <property name="height">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScrolledWindow">
+        <child>
+          <object class="GtkTextView" id="Q_builder_Z_note">
+            <property name="accepts-tab">FALSE</property>
+            <property name="can-focus">FALSE</property>
+            <property name="cursor-visible">FALSE</property>
+            <property name="editable">FALSE</property>
+            <property name="expand">TRUE</property>
+            <property name="input-hints">GTK_INPUT_HINT_SPELLCHECK</property>
+            <property name="left-margin">1</property>
+            <property name="pixels-inside-wrap">3</property>
+            <property name="pixels-below-lines">6</property>
+            <property name="right-margin">1</property>
+            <property name="wrap-mode">GTK_WRAP_WORD</property>
+            <signal name="focus-in-event" handler="E_note_tab_Q_note_Z_gtk_X_focus_in_event"/>
+            <signal name="focus-out-event" handler="E_note_tab_Q_note_Z_gtk_X_focus_out_event"/>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left-attach">72</property>
+        <property name="top-attach">2</property>
+        <property name="width">28</property>
+        <property name="height">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkFrame" id="Q_builder_Z_note_attr">
+        <child>
+          <object class="GtkBox">
+            <property name="margin-bottom">8</property>
+            <property name="margin-start">6</property>
+            <property name="margin-end">8</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">creation date: </property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="Q_builder_Z_note_date">
+                <property name="selectable">TRUE</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left-attach">72</property>
+        <property name="top-attach">3</property>
+        <property name="width">28</property>
+        <property name="height">1</property>
+      </packing>
+    </child>
+  </object>
+</interface>
