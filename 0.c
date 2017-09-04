@@ -132,10 +132,8 @@ E_main_Z_gtk_Q_program_I_about( GSimpleAction *action
     , "program-name", "ouxy notepad"
     , "version", "0.13 (" __DATE__ ")"
     , "comments", "where an infinity ends or begins…"
-    , "website", "http://gj3d.1apps.com/goto.asp?product=%E2%80%9Fnotepad%E2%80%9D"
-    , "website-label", "http://gj3d.1apps.com/"
-    , "copyright", "©2013‐2016 overcq"
-    , "authors", ( char *[] ){ "overcq@bigmir.net (overcq)", null }
+    , "copyright", "©2013‐2017 overcq"
+    , "authors", ( char *[] ){ "ocq@tutanota.com (overcq)", null }
     , "license", s_licence
     , null
     );
