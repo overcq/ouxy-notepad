@@ -1,3 +1,5 @@
+//==============================================================================
+gboolean E_undo_S_join_broken = no;
 //=============================================================================
 void
 E_undo_Q_note_Z_gtk_X_insert_text( GtkTextBuffer *text_buffer
@@ -30,16 +32,19 @@ E_undo_Q_note_Z_gtk_X_insert_text( GtkTextBuffer *text_buffer
     }
     int length = g_utf8_strlen( text, -1 );
     int p = gtk_text_iter_get_offset(location);
-    if( data->undo_array->len )
-    {   struct E_undo_Q_note_Z_action_data *undo_1 = &g_array_index( data->undo_array, struct E_undo_Q_note_Z_action_data, data->undo_array->len - 1 );
+    gboolean join_broken = E_undo_S_join_broken;
+    E_undo_S_join_broken = no;
+    if( data->undo_array->len
+    && !join_broken
+    ){  struct E_undo_Q_note_Z_action_data *undo_1 = &g_array_index( data->undo_array, struct E_undo_Q_note_Z_action_data, data->undo_array->len - 1 );
         if( undo_1->type == E_undo_Q_note_Z_action_S_text_inserted
-          && p >= undo_1->position
-          && p <= undo_1->position + undo_1->u.length
+        && p >= undo_1->position
+        && p <= undo_1->position + undo_1->u.length
         ){  if( data->undo_array->len >= 2 )
             {   struct E_undo_Q_note_Z_action_data *undo_2 = &g_array_index( data->undo_array, struct E_undo_Q_note_Z_action_data, data->undo_array->len - 2 );
                 if( undo_2->type == E_undo_Q_note_Z_action_S_text_deleted
-                  && undo_1->position == undo_2->position
-                  && g_utf8_strlen( undo_2->u.text, -1 ) == undo_1->u.length + length
+                && undo_1->position == undo_2->position
+                && g_utf8_strlen( undo_2->u.text, -1 ) == undo_1->u.length + length
                 ){  GtkTextIter start, end;
                     gtk_text_buffer_get_iter_at_offset( text_buffer, &start, undo_1->position );
                     gtk_text_buffer_get_iter_at_offset( text_buffer, &end, undo_1->position + undo_1->u.length );
@@ -48,8 +53,8 @@ E_undo_Q_note_Z_gtk_X_insert_text( GtkTextBuffer *text_buffer
                         , text
                         , g_utf8_offset_to_pointer( text, p - undo_1->position ) - text
                         )
-                      && !memcmp( g_utf8_offset_to_pointer( undo_2->u.text, p - undo_2->position ), text, length_ )
-                      && !strcmp( g_utf8_offset_to_pointer( undo_2->u.text, p - undo_2->position ) + length_
+                    && !memcmp( g_utf8_offset_to_pointer( undo_2->u.text, p - undo_2->position ), text, length_ )
+                    && !strcmp( g_utf8_offset_to_pointer( undo_2->u.text, p - undo_2->position ) + length_
                         , g_utf8_offset_to_pointer( text, p - undo_1->position )
                         )
                     ){  g_free(text);
@@ -64,8 +69,8 @@ E_undo_Q_note_Z_gtk_X_insert_text( GtkTextBuffer *text_buffer
             return;
         }
         if( undo_1->type == E_undo_Q_note_Z_action_S_text_deleted
-          && p == undo_1->position
-          && !strcmp( text, undo_1->u.text )
+        && p == undo_1->position
+        && !strcmp( text, undo_1->u.text )
         ){  g_free( undo_1->u.text );
             g_array_remove_index( data->undo_array, data->undo_array->len - 1 );
             return;
@@ -111,10 +116,13 @@ E_undo_Q_note_Z_gtk_X_delete_range( GtkTextBuffer *text_buffer
     int b = gtk_text_iter_get_offset(end);
     J_order(int,a,b);
     char *text = gtk_text_iter_get_text( start, end );
-    if( data->undo_array->len )
-    {   struct E_undo_Q_note_Z_action_data *undo = &g_array_index( data->undo_array, struct E_undo_Q_note_Z_action_data, data->undo_array->len - 1 );
+    gboolean join_broken = E_undo_S_join_broken;
+    E_undo_S_join_broken = no;
+    if( data->undo_array->len
+    && !join_broken
+    ){  struct E_undo_Q_note_Z_action_data *undo = &g_array_index( data->undo_array, struct E_undo_Q_note_Z_action_data, data->undo_array->len - 1 );
         if( undo->type == E_undo_Q_note_Z_action_S_text_deleted
-          && ( a == undo->position || b == undo->position )
+        && ( a == undo->position || b == undo->position )
         ){  char *t;
             if( a == undo->position )
                 t = g_strconcat( undo->u.text, text, null );
@@ -154,7 +162,7 @@ E_undo_Q_note_Z_gtk_I_undo( GSimpleAction *action
     );
     g_object_unref( text_buffer );
     if( !data->undo_array
-      || data->undo_back >= data->undo_array->len
+    || data->undo_back >= data->undo_array->len
     )
         return;
     data->undo_back++;
@@ -204,7 +212,7 @@ E_undo_Q_note_Z_gtk_I_redo( GSimpleAction *action
     );
     g_object_unref( text_buffer );
     if( !data->undo_array
-      || !data->undo_back
+    || !data->undo_back
     )
         return;
     struct E_undo_Q_note_Z_action_data *undo = &g_array_index( data->undo_array, struct E_undo_Q_note_Z_action_data, data->undo_array->len - data->undo_back );

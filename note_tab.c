@@ -320,6 +320,7 @@ E_note_tab_Q_books_tree_Z_gtk_X_selection_changed( GtkTreeSelection *selection
         if( notes_tree_store == gtk_tree_view_get_model( notes_tree_view ))
             return;
     }
+    E_undo_S_join_broken = yes;
     if( notes_tree_store )
     {   gtk_tree_view_set_model( notes_tree_view, notes_tree_store );
         gtk_tree_view_set_search_column( notes_tree_view, E_note_tab_Q_tree_Z_column_S_title );
@@ -336,7 +337,8 @@ _EXPORT_OBFUSCATE
 void
 E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed( GtkTreeSelection *selection
 , void *data
-){  GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(selection);
+){  E_undo_S_join_broken = yes;
+    GtkTreeView *tree_view = gtk_tree_selection_get_tree_view(selection);
     struct E_note_tab_Q_ext_data_Z *note_tab_ext_data = &g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, gtk_notebook_page_num( E_note_tab_Q_note_tab_S, gtk_widget_get_parent( gtk_widget_get_parent(( void * )tree_view ))));
     GtkTextView *note_text_view = note_tab_ext_data->note;
     GtkTreeModel *notes_tree_store;
@@ -455,6 +457,7 @@ E_note_tab_Q_note_Z_gtk_X_focus_out_event( GtkWidget *widget
 , GdkEvent *event
 , void *data
 ){  E_note_tab_Q_actions_Z_note_P_enabled(no);
+    E_undo_S_join_broken = yes;
     return no;
 }
 _EXPORT_OBFUSCATE

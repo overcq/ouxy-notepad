@@ -237,7 +237,7 @@
   <object class="GtkTextTagTable" id="Q_builder_Z_note_tag_table">
     <child type="tag">
       <object class="GtkTextTag" id="Q_builder_Z_note_search_tag">
-        <property name="background">#c49c9c</property>
+        <property name="background">#c79c9c</property>
       </object>
     </child>
   </object>
