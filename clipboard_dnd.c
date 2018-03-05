@@ -10,6 +10,7 @@ const GtkTargetEntry E_dnd_Q_tree_S_data_types[2] =
 };
 //=============================================================================
 GtkTreeModel *E_dnd_Z_gtk_Q_tree_drag_source_S_store;
+GtkTreeIter E_dnd_Z_gtk_Q_tree_drag_source_S_books_iter;
 bool E_dnd_Z_gtk_Q_tree_drag_dest_U_gave_data_into_native; ///użycie trybu “move” ‘drag & drop’, ale usuwanie danych źródłowych tylko wtedy, gdy umieszczono je w kształtce notatnika ·w tym· programie.
 bool E_dnd_Z_gtk_Q_tree_drag_source_U_native_checked, E_dnd_Z_gtk_Q_tree_drag_source_S_native_check_result; ///odwraca sprawdzanie, czy można upuścić dane— ze sprawdzania celu na sprawdzanie źródła ‘natywnego’, ale w jedynie dostępnej procedurze wywoływanej dla celu.
 //=============================================================================
@@ -52,6 +53,12 @@ E_dnd_Z_gtk_Q_tree_drag_source_I_row_draggable( GtkTreeDragSource *store
 , GtkTreePath *path
 ){  E_dnd_Z_gtk_Q_tree_drag_source_S_store = ( void * )store;
     E_dnd_Z_gtk_Q_tree_drag_source_U_native_checked = no;
+    struct E_note_tab_Q_ext_data_Z *note_tab_ext_data = &g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, E_note_tab_Q_note_tab_S_current_tab );
+    GtkTreeModel *books_model = gtk_tree_view_get_model( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ]);
+    if( GTK_TREE_MODEL( E_dnd_Z_gtk_Q_tree_drag_source_S_store ) != books_model )
+    {   GtkTreeSelection *selection = gtk_tree_view_get_selection( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ]);
+        gtk_tree_selection_get_selected( selection, null, &E_dnd_Z_gtk_Q_tree_drag_source_S_books_iter );
+    }
     return yes;
 }
 gboolean
@@ -113,15 +120,62 @@ E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_get( GtkTreeDragSource *store
 gboolean
 E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete( GtkTreeDragSource *store
 , GtkTreePath *path
-){  if( !E_dnd_Z_gtk_Q_tree_drag_dest_U_gave_data_into_native )
+){  GtkTreeIter iter;
+    if( G_OBJECT_TYPE( E_dnd_Z_gtk_Q_tree_drag_source_S_store ) == GTK_TYPE_TREE_STORE )
+    {   int n = gtk_notebook_get_n_pages( E_note_tab_Q_note_tab_S );
+        for( int i = 0; i != n; i++ )
+        {   gboolean continue_ = false;
+            struct E_note_tab_Q_ext_data_Z *note_tab_ext_data = &g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, i );
+            GtkTreeSelection *selection;
+            GtkTreeModel *model;
+            GtkTreePath *selected_path;
+            model = gtk_tree_view_get_model( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ]);
+            if( GTK_TREE_MODEL( E_dnd_Z_gtk_Q_tree_drag_source_S_store ) != model )
+            {   selection = gtk_tree_view_get_selection( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ]);
+                gtk_tree_selection_get_selected( selection, null, &iter );
+                selected_path = gtk_tree_model_get_path( model, &iter );
+                GtkTreePath *books_path = gtk_tree_model_get_path( model, &E_dnd_Z_gtk_Q_tree_drag_source_S_books_iter );
+                if( gtk_tree_path_compare( selected_path, books_path ) == 0 )
+                    continue_ = true;
+                gtk_tree_path_free( books_path );
+                gtk_tree_path_free( selected_path );
+            }else
+                continue_ = true;
+            if( continue_ )
+            {   selection = gtk_tree_view_get_selection( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ]);
+                gtk_tree_selection_get_selected( selection, &model, &iter );
+                selected_path = gtk_tree_model_get_path( model, &iter );
+                GtkTreePath *path_ = gtk_tree_path_copy(path);
+                if(( gtk_tree_path_compare( selected_path, path ) == 0
+                  || gtk_tree_path_is_descendant( selected_path, path )
+                )
+                && gtk_tree_path_up( path_ )
+                )
+                {   struct E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete_I_Z *data = g_new( struct E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete_I_Z, 1 );
+                    data->selection = selection;
+                    data->path_ = path_;
+                    g_idle_add( E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete_I, data );
+                }
+                gtk_tree_path_free( selected_path );
+            }
+        }
+    }
+    if( !E_dnd_Z_gtk_Q_tree_drag_dest_U_gave_data_into_native )
         return no;
-    GtkTreeIter iter;
     gtk_tree_model_get_iter( E_dnd_Z_gtk_Q_tree_drag_source_S_store, &iter, path );
     if( G_OBJECT_TYPE( E_dnd_Z_gtk_Q_tree_drag_source_S_store ) == GTK_TYPE_LIST_STORE )
         gtk_list_store_remove(( void * )E_dnd_Z_gtk_Q_tree_drag_source_S_store, &iter );
     else
         gtk_tree_store_remove(( void * )E_dnd_Z_gtk_Q_tree_drag_source_S_store, &iter );
     return yes;
+}
+gboolean
+E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete_I( void *data
+){  struct E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete_I_Z *data_ = data;
+    gtk_tree_selection_select_path( data_->selection, data_->path_ );
+    gtk_tree_path_free( data_->path_ );
+    g_free( data_ );
+    return no;
 }
 //-----------------------------------------------------------------------------
 gboolean

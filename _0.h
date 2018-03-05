@@ -59,6 +59,11 @@ typedef N bool;
 #define E_dnd_Q_tree_Z_data_type_S_native_S_atom_name "GTK_TREE_MODEL_ROW"
 #define E_dnd_Q_tree_Z_data_type_S_text_S_atom_name "UTF8_STRING"
 //==============================================================================
+struct E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete_I_Z
+{ GtkTreeSelection *selection;
+  GtkTreePath *path_;
+};
+//------------------------------------------------------------------------------
 enum E_note_tab_Q_ext_data_Z_tree
 { E_note_tab_Q_ext_data_Z_tree_S_books
 , E_note_tab_Q_ext_data_Z_tree_S_notes

@@ -668,7 +668,7 @@ E_note_tab_Q_note_tab_M_i( int i
     GtkTreeStore *notes_tree_store = E_note_tab_Q_tree_Q_store_M();
     gtk_tree_view_set_model( note_tab_ext_data.tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], ( void * )notes_tree_store );
     g_object_unref( notes_tree_store );
-    for( enum E_note_tab_Q_ext_data_Z_tree i = 0; i < E_note_tab_Q_ext_data_Z_tree_S_n_; i++ )
+    for( enum E_note_tab_Q_ext_data_Z_tree i = 0; i != E_note_tab_Q_ext_data_Z_tree_S_n_; i++ )
     {   gtk_tree_view_set_search_equal_func( note_tab_ext_data.tree[i]
         , E_search_Q_tree_Z_gtk_I_search_cmp
         , null
