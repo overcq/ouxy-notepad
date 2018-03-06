@@ -30,7 +30,16 @@ E_search_Q_tree_Z_gtk_I_search_cmp( GtkTreeModel *tree_store
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool
-E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( gunichar *s_u
+E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( gunichar *s_u
+, gunichar **words
+, unsigned words_n
+){  for( unsigned i = 0; i < words_n; i++ )
+        if( !E_string_Q_unistring_R_substr_after( s_u, words[i] ))
+            return no;
+    return yes;
+}
+bool
+E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( gunichar *s_u
 , gunichar **words
 , unsigned words_n
 , gunichar **words_found
@@ -96,28 +105,44 @@ E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( gunichar *s_u
     return no;
 }
 bool
-E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( gunichar *s_u
-, gunichar **words
-, unsigned words_n
-){  for( unsigned i = 0; i < words_n; i++ )
-        if( !E_string_Q_unistring_R_substr_after( s_u, words[i] ))
+E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( gunichar *s_u
+, gunichar *chars
+){  if( !E_string_Q_unistring_R_substr_after( s_u, chars ))
             return no;
     return yes;
 }
 bool
 E_search_Q_note_tab_Z_gtk_I_search_I_note( GtkTextBuffer *text_buffer
+, gunichar **inexact_words
+, unsigned inexact_words_n
 , gunichar **exact_words
 , unsigned exact_words_n
 , gunichar **exact_words_found
 , void *exact_words_bit
-, gunichar **inexact_words
-, unsigned inexact_words_n
+, gunichar *exact_chars
 ){  GtkTextIter start, end;
     gtk_text_buffer_get_bounds( text_buffer, &start, &end );
     char *s = gtk_text_iter_get_slice( &start, &end );
     gunichar *s_u_ = g_utf8_to_ucs4_fast( s, -1, null );
     g_free(s);
     E_string_Q_unistring_P_to_lower( s_u_ );
+    if( inexact_words_n )
+        for( unsigned i = 0; i < inexact_words_n; i++ )
+        {   unsigned word_len = E_string_Q_unistring_R_length( inexact_words[i] );
+            gunichar *s_u = s_u_, *s_u_f;
+            while( s_u_f = E_string_Q_unistring_R_substr_after( s_u, inexact_words[i] ))
+            {   GtkTextIter start, end;
+                gtk_text_buffer_get_iter_at_offset( text_buffer, &start, s_u_f - s_u_ - word_len );
+                gtk_text_buffer_get_iter_at_offset( text_buffer, &end, s_u_f - s_u_ );
+                gtk_text_buffer_apply_tag( text_buffer, E_note_tab_Q_note_Z_tag_S_search, &start, &end );
+                s_u = s_u_f - word_len + 1;
+            }
+            if( s_u == s_u_ )
+            {   g_free( s_u_ );
+                gtk_text_buffer_remove_tag( text_buffer, E_note_tab_Q_note_Z_tag_S_search, &start, &end );
+                return no;
+            }
+        }
     if( exact_words_n )
     {   for( unsigned i = 0; i < exact_words_n; i++ )
             exact_words_found[i] = exact_words[i];
@@ -188,23 +213,22 @@ E_search_Q_note_tab_Z_gtk_I_search_I_note( GtkTextBuffer *text_buffer
             return no;
         }
     }
-    if( inexact_words_n )
-        for( unsigned i = 0; i < inexact_words_n; i++ )
-        {   unsigned word_len = E_string_Q_unistring_R_length( inexact_words[i] );
-            gunichar *s_u = s_u_, *s_u_f;
-            while( s_u_f = E_string_Q_unistring_R_substr_after( s_u, inexact_words[i] ))
-            {   GtkTextIter start, end;
-                gtk_text_buffer_get_iter_at_offset( text_buffer, &start, s_u_f - s_u_ - word_len );
-                gtk_text_buffer_get_iter_at_offset( text_buffer, &end, s_u_f - s_u_ );
-                gtk_text_buffer_apply_tag( text_buffer, E_note_tab_Q_note_Z_tag_S_search, &start, &end );
-                s_u = s_u_f - word_len + 1;
-            }
-            if( s_u == s_u_ )
-            {   g_free( s_u_ );
-                gtk_text_buffer_remove_tag( text_buffer, E_note_tab_Q_note_Z_tag_S_search, &start, &end );
-                return no;
-            }
+    if( *exact_chars != '\0' )
+    {   unsigned chars_len = E_string_Q_unistring_R_length( exact_chars );
+        gunichar *s_u = s_u_, *s_u_f;
+        while( s_u_f = E_string_Q_unistring_R_substr_after( s_u, exact_chars ))
+        {   GtkTextIter start, end;
+            gtk_text_buffer_get_iter_at_offset( text_buffer, &start, s_u_f - s_u_ - chars_len );
+            gtk_text_buffer_get_iter_at_offset( text_buffer, &end, s_u_f - s_u_ );
+            gtk_text_buffer_apply_tag( text_buffer, E_note_tab_Q_note_Z_tag_S_search, &start, &end );
+            s_u = s_u_f - chars_len + 1;
         }
+        if( s_u == s_u_ )
+        {   g_free( s_u_ );
+            gtk_text_buffer_remove_tag( text_buffer, E_note_tab_Q_note_Z_tag_S_search, &start, &end );
+            return no;
+        }
+    }
     g_free( s_u_ );
     return yes;
 }
@@ -240,6 +264,27 @@ E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( const char *s_
         g_string_truncate( str, str->len - 1 );
     return g_string_free( str, no );
 }
+char *
+E_note_tab_Q_search_Z_gtk_Q_string_R_norm( const char *s_
+){  char *s = g_utf8_normalize( s_, -1, G_NORMALIZE_DEFAULT_COMPOSE );
+    if( !s )
+    {   E_error_K( "‘utf-8’ normalize" );
+        return g_strdup( "" );
+    }
+    GString *str = g_string_new(s);
+    g_free(s);
+    while( str->len
+    && g_unichar_isspace( g_utf8_get_char( g_utf8_prev_char( str->str + str->len )))
+    ){  char *s_ = g_utf8_prev_char( str->str + str->len );
+        g_string_erase( str, s_ - str->str, -1 );
+    }
+    while( str->len
+    && g_unichar_isspace( g_utf8_get_char( str->str ))
+    ){  char *s_ = g_utf8_next_char( str->str );
+        g_string_erase( str, 0, s_ - str->str );
+    }
+    return g_string_free( str, no );
+}
 void
 E_search_Q_note_tab_Z_gtk_I_search_next_I_note_found_ending( GtkTextBuffer *text_buffer
 , struct E_note_tab_Q_ext_data_Z *note_tab_ext_data
@@ -268,13 +313,24 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
     struct E_note_tab_Q_ext_data_Z *note_tab_ext_data = &g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, tab );
     note_tab_ext_data->default_previous = no;
     g_idle_add( E_search_Q_note_tab_I_grab_default_Z_gtk_I_idle, note_tab_ext_data->search_next );
-    char *s = E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_exact ));
-    gunichar **exact_words = ( gunichar ** ) g_strsplit( s, " ", 0 );
-    g_free(s);
-    s = E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_inexact ));
+    char *s = E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_inexact ));
     gunichar **inexact_words = ( gunichar ** ) g_strsplit( s, " ", 0 );
     g_free(s);
-    gunichar **a = exact_words;
+    s = E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_exact ));
+    gunichar **exact_words = ( gunichar ** ) g_strsplit( s, " ", 0 );
+    g_free(s);
+    gunichar *exact_chars = g_utf8_to_ucs4_fast( E_note_tab_Q_search_Z_gtk_Q_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_exact_chars )), -1, null );
+    E_string_Q_unistring_P_to_lower( exact_chars );
+    gunichar **a = inexact_words;
+    while( *a )
+    {   gunichar *s = g_utf8_to_ucs4_fast( *( char ** ) a, -1, null );
+        g_free( *a );
+        E_string_Q_unistring_P_to_lower(s);
+        *a = s;
+        a++;
+    }
+    unsigned inexact_words_n = a - inexact_words;
+    a = exact_words;
     while( *a )
     {   gunichar *s = g_utf8_to_ucs4_fast( *( char ** ) a, -1, null );
         g_free( *a );
@@ -289,16 +345,7 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
     {   exact_words_found = g_new( gunichar *, exact_words_n );
         exact_words_bit = E_string_Q_bit_array_M( exact_words_n );
     }
-    a = inexact_words;
-    while( *a )
-    {   gunichar *s = g_utf8_to_ucs4_fast( *( char ** ) a, -1, null );
-        g_free( *a );
-        E_string_Q_unistring_P_to_lower(s);
-        *a = s;
-        a++;
-    }
-    unsigned inexact_words_n = a - inexact_words;
-    if( !exact_words_n && !inexact_words_n )
+    if( !exact_words_n && !inexact_words_n && *exact_chars == '\0' )
         goto End_0;
     bool b;
     char *start_notes_iter_s = null;
@@ -338,7 +385,7 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
                 GtkTextIter end;
                 gtk_text_buffer_get_end_iter( text_buffer, &end );
                 gtk_text_buffer_remove_tag( text_buffer, E_note_tab_Q_note_Z_tag_S_search, &start, &end );
-            }else if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, exact_words, exact_words_n, exact_words_found, exact_words_bit, inexact_words, inexact_words_n ))
+            }else if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, inexact_words, inexact_words_n, exact_words, exact_words_n, exact_words_found, exact_words_bit, exact_chars ))
             {   E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed_I_clear_search_U_skip = yes;
                 GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                 E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -370,8 +417,9 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
                     gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
                     g_free(s);
                     E_string_Q_unistring_P_to_lower( s_u );
-                    if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-                    && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+                    if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+                    && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+                    && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
                     ){  g_free( s_u );
                         GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                         E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -386,7 +434,7 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
                     , -1
                     );
                     g_object_unref( text_buffer );
-                    if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, exact_words, exact_words_n, exact_words_found, exact_words_bit, inexact_words, inexact_words_n ))
+                    if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, inexact_words, inexact_words_n, exact_words, exact_words_n, exact_words_found, exact_words_bit, exact_chars ))
                     {   E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed_I_clear_search_U_skip = yes;
                         GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                         E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -437,8 +485,9 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
         gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
         g_free(s);
         E_string_Q_unistring_P_to_lower( s_u );
-        if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-        && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+        if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+        && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+        && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
         ){  g_free( s_u );
             GtkTreePath *path = gtk_tree_model_get_path( E_note_tab_Q_note_tab_S_books_tree_store, &books_iter );
             gtk_tree_selection_unselect_path( gtk_tree_view_get_selection( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ] ), path );
@@ -468,8 +517,9 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
                 gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
                 g_free(s);
                 E_string_Q_unistring_P_to_lower( s_u );
-                if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-                && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+                if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+                && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+                && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
                 ){  g_free( s_u );
                     GtkTreePath *path = gtk_tree_model_get_path( E_note_tab_Q_note_tab_S_books_tree_store, &books_iter );
                     E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ], path );
@@ -487,7 +537,7 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
                 , -1
                 );
                 g_object_unref( text_buffer );
-                if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, exact_words, exact_words_n, exact_words_found, exact_words_bit, inexact_words, inexact_words_n ))
+                if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, inexact_words, inexact_words_n, exact_words, exact_words_n, exact_words_found, exact_words_bit, exact_chars ))
                 {   GtkTreePath *path = gtk_tree_model_get_path( E_note_tab_Q_note_tab_S_books_tree_store, &books_iter );
                     E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed_I_clear_search_U_skip = yes;
                     E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ], path );
@@ -533,8 +583,9 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
         gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
         g_free(s);
         E_string_Q_unistring_P_to_lower( s_u );
-        if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-        && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+        if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+        && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+        && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
         ){  g_free( s_u );
             GtkTreePath *path = gtk_tree_model_get_path( E_note_tab_Q_note_tab_S_books_tree_store, &books_iter );
             gtk_tree_selection_unselect_path( gtk_tree_view_get_selection( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ] ), path );
@@ -569,8 +620,9 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
             gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
             g_free(s);
             E_string_Q_unistring_P_to_lower( s_u );
-            if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-            && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+            if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+            && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+            && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
             ){  g_free( s_u );
                 GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                 E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -585,7 +637,7 @@ E_search_Q_note_tab_Z_gtk_I_search_next( GtkButton *button
             , -1
             );
             g_object_unref( text_buffer );
-            if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, exact_words, exact_words_n, exact_words_found, exact_words_bit, inexact_words, inexact_words_n ))
+            if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, inexact_words, inexact_words_n, exact_words, exact_words_n, exact_words_found, exact_words_bit, exact_chars ))
             {   E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed_I_clear_search_U_skip = yes;
                 GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                 E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -641,13 +693,24 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
     struct E_note_tab_Q_ext_data_Z *note_tab_ext_data = &g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, tab );
     note_tab_ext_data->default_previous = yes;
     g_idle_add( E_search_Q_note_tab_I_grab_default_Z_gtk_I_idle, note_tab_ext_data->search_previous );
-    char *s = E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_exact ));
-    gunichar **exact_words = ( gunichar ** ) g_strsplit( s, " ", 0 );
-    g_free(s);
-    s = E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_inexact ));
+    char *s = E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_inexact ));
     gunichar **inexact_words = ( gunichar ** ) g_strsplit( s, " ", 0 );
     g_free(s);
-    gunichar **a = exact_words;
+    s = E_note_tab_Q_search_Z_gtk_Q_key_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_exact ));
+    gunichar **exact_words = ( gunichar ** ) g_strsplit( s, " ", 0 );
+    g_free(s);
+    gunichar *exact_chars = g_utf8_to_ucs4_fast( E_note_tab_Q_search_Z_gtk_Q_string_R_norm( gtk_entry_get_text( note_tab_ext_data->search_exact_chars )), -1, null );
+    E_string_Q_unistring_P_to_lower( exact_chars );
+    gunichar **a = inexact_words;
+    while( *a )
+    {   gunichar *s = g_utf8_to_ucs4_fast( *( char ** ) a, -1, null );
+        g_free( *a );
+        E_string_Q_unistring_P_to_lower(s);
+        *a = s;
+        a++;
+    }
+    unsigned inexact_words_n = a - inexact_words;
+    a = exact_words;
     while( *a )
     {   gunichar *s = g_utf8_to_ucs4_fast( *( char ** ) a, -1, null );
         g_free( *a );
@@ -662,16 +725,7 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
     {   exact_words_found = g_new( gunichar *, exact_words_n );
         exact_words_bit = E_string_Q_bit_array_M( exact_words_n );
     }
-    a = inexact_words;
-    while( *a )
-    {   gunichar *s = g_utf8_to_ucs4_fast( *( char ** ) a, -1, null );
-        g_free( *a );
-        E_string_Q_unistring_P_to_lower(s);
-        *a = s;
-        a++;
-    }
-    unsigned inexact_words_n = a - inexact_words;
-    if( !exact_words_n && !inexact_words_n )
+    if( !exact_words_n && !inexact_words_n && *exact_chars == '\0' )
         goto End_0;
     char *start_notes_iter_s = null;
     GtkTreeModel *notes_tree_store;
@@ -721,8 +775,9 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
                 gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
                 g_free(s);
                 E_string_Q_unistring_P_to_lower( s_u );
-                if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-                && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+                if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+                && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+                && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
                 ){  g_free( s_u );
                     GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                     E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -753,7 +808,7 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
                     , -1
                     );
                     g_object_unref( text_buffer );
-                    if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, exact_words, exact_words_n, exact_words_found, exact_words_bit, inexact_words, inexact_words_n ))
+                    if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, inexact_words, inexact_words_n, exact_words, exact_words_n, exact_words_found, exact_words_bit, exact_chars ))
                     {   E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed_I_clear_search_U_skip = yes;
                         GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                         E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -770,8 +825,9 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
                     gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
                     g_free(s);
                     E_string_Q_unistring_P_to_lower( s_u );
-                    if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-                    && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+                    if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+                    && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+                    && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
                     ){  g_free( s_u );
                         GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                         E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -799,8 +855,9 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
             gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
             g_free(s);
             E_string_Q_unistring_P_to_lower( s_u );
-            if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-            && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+            if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+            && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+            && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
             ){  g_free( s_u );
                 GtkTreePath *path = gtk_tree_model_get_path( E_note_tab_Q_note_tab_S_books_tree_store, &books_iter );
                 gtk_tree_selection_unselect_path( gtk_tree_view_get_selection( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ] ), path );
@@ -856,7 +913,7 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
                 , -1
                 );
                 g_object_unref( text_buffer );
-                if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, exact_words, exact_words_n, exact_words_found, exact_words_bit, inexact_words, inexact_words_n ))
+                if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, inexact_words, inexact_words_n, exact_words, exact_words_n, exact_words_found, exact_words_bit, exact_chars ))
                 {   E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed_I_clear_search_U_skip = yes;
                     GtkTreePath *path = gtk_tree_model_get_path( E_note_tab_Q_note_tab_S_books_tree_store, &books_iter );
                     E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ], path );
@@ -876,8 +933,9 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
                 gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
                 g_free(s);
                 E_string_Q_unistring_P_to_lower( s_u );
-                if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-                && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+                if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+                && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+                && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
                 ){  g_free( s_u );
                     GtkTreePath *path = gtk_tree_model_get_path( E_note_tab_Q_note_tab_S_books_tree_store, &books_iter );
                     E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ], path );
@@ -909,8 +967,9 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
         gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
         g_free(s);
         E_string_Q_unistring_P_to_lower( s_u );
-        if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-        && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+        if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+        && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+        && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
         ){  g_free( s_u );
             GtkTreePath *path = gtk_tree_model_get_path( E_note_tab_Q_note_tab_S_books_tree_store, &books_iter );
             gtk_tree_selection_unselect_path( gtk_tree_view_get_selection( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ] ), path );
@@ -955,7 +1014,7 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
             , -1
             );
             g_object_unref( text_buffer );
-            if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, exact_words, exact_words_n, exact_words_found, exact_words_bit, inexact_words, inexact_words_n ))
+            if( E_search_Q_note_tab_Z_gtk_I_search_I_note( text_buffer, inexact_words, inexact_words_n, exact_words, exact_words_n, exact_words_found, exact_words_bit, exact_chars ))
             {   E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed_I_clear_search_U_skip = yes;
                 GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                 E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );
@@ -972,8 +1031,9 @@ E_search_Q_note_tab_Z_gtk_I_search_previous( GtkButton *button
             gunichar *s_u = g_utf8_to_ucs4_fast( s, -1, null );
             g_free(s);
             E_string_Q_unistring_P_to_lower( s_u );
-            if(( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
-            && ( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_cmp( s_u, inexact_words, inexact_words_n ))
+            if(( !inexact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_inexact_words_cmp( s_u, inexact_words, inexact_words_n ))
+            && ( !exact_words_n || E_search_Q_note_tab_Z_gtk_I_search_I_exact_words_cmp( s_u, exact_words, exact_words_n, exact_words_found ))
+            && ( *exact_chars == '\0' || E_search_Q_note_tab_Z_gtk_I_search_I_exact_chars_cmp( s_u, exact_chars ))
             ){  g_free( s_u );
                 GtkTreePath *path = gtk_tree_model_get_path( notes_tree_store, &notes_iter );
                 E_note_tab_Q_tree_Z_gtk_I_set_cursor( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ], path );

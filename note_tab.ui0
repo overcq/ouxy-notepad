@@ -154,7 +154,7 @@
             <property name="input-hints">GTK_INPUT_HINT_NO_SPELLCHECK</property>
             <property name="margin-end">1</property>
             <property name="placeholder-text">inexact words</property>
-            <property name="secondary-icon-name">gtk-clear</property>
+            <property name="secondary-icon-name">edit-clear</property>
             <signal name="changed" handler="E_note_tab_Q_search_Z_gtk_X_changed"/>
             <signal name="focus-in-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_in_event"/>
             <signal name="focus-out-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_out_event"/>
@@ -168,7 +168,21 @@
             <property name="input-hints">GTK_INPUT_HINT_NO_SPELLCHECK</property>
             <property name="margin-end">1</property>
             <property name="placeholder-text">exact words</property>
-            <property name="secondary-icon-name">gtk-clear</property>
+            <property name="secondary-icon-name">edit-clear</property>
+            <signal name="changed" handler="E_note_tab_Q_search_Z_gtk_X_changed"/>
+            <signal name="focus-in-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_in_event"/>
+            <signal name="focus-out-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_out_event"/>
+            <signal name="icon-press" handler="E_search_Q_search_entry_Z_gtk_X_icon_press"/>
+          </object>
+        </child>
+        <child>
+          <object class="GtkEntry" id="Q_builder_Z_search_exact_chars">
+            <property name="activates-default">TRUE</property>
+            <property name="has-frame">FALSE</property>
+            <property name="input-hints">GTK_INPUT_HINT_NO_SPELLCHECK</property>
+            <property name="margin-end">1</property>
+            <property name="placeholder-text">exact characters case insensitive</property>
+            <property name="secondary-icon-name">edit-clear</property>
             <signal name="changed" handler="E_note_tab_Q_search_Z_gtk_X_changed"/>
             <signal name="focus-in-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_in_event"/>
             <signal name="focus-out-event" handler="E_note_tab_Q_search_Z_gtk_X_focus_out_event"/>

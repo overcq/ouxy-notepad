@@ -11,6 +11,7 @@ OBFUSCATE( Q_builder_Z_new_tab_names );
 OBFUSCATE( Q_builder_Z_search );
 OBFUSCATE( Q_builder_Z_search_inexact );
 OBFUSCATE( Q_builder_Z_search_exact );
+OBFUSCATE( Q_builder_Z_search_exact_chars );
 OBFUSCATE( Q_builder_Z_search_next );
 OBFUSCATE( Q_builder_Z_search_previous );
 //=============================================================================
@@ -657,6 +658,7 @@ E_note_tab_Q_note_tab_M_i( int i
     gtk_tree_path_free(path);
     note_tab_ext_data.search_inexact = ( void * )gtk_builder_get_object( builder, Q_builder_Z_search_inexact );
     note_tab_ext_data.search_exact = ( void * )gtk_builder_get_object( builder, Q_builder_Z_search_exact );
+    note_tab_ext_data.search_exact_chars = ( void * )gtk_builder_get_object( builder, Q_builder_Z_search_exact_chars );
     note_tab_ext_data.Q_notes_tree_U_selected = no;
     note_tab_ext_data.default_previous = no;
     note_tab_ext_data.search_next = ( void * )gtk_builder_get_object( builder, Q_builder_Z_search_next );
@@ -699,6 +701,7 @@ E_note_tab_Q_note_tab_M_i( int i
     gtk_container_set_focus_chain(( void * )note_tab_container, tab_order );
     g_list_free( tab_order );
     tab_order = null;
+    tab_order = g_list_prepend( tab_order, note_tab_ext_data.search_exact_chars );
     tab_order = g_list_prepend( tab_order, note_tab_ext_data.search_exact );
     tab_order = g_list_prepend( tab_order, note_tab_ext_data.search_inexact );
     GtkWidget *search = ( void * )gtk_builder_get_object( builder, Q_builder_Z_search );

@@ -93,7 +93,7 @@ struct E_note_tab_Q_ext_data_Z
   GtkContainer *note_attr;
   GtkLabel *note_date;
   GtkTreeView *new_tab_names_tree;
-  GtkEntry *search_exact, *search_inexact;
+  GtkEntry *search_inexact, *search_exact, *search_exact_chars;
   GtkButton *search_next, *search_previous;
   bool default_previous;
   bool Q_notes_tree_U_selected;
