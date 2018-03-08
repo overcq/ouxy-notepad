@@ -4,6 +4,7 @@
     <section>
       <item>
         <attribute name="label" translatable="yes">_about</attribute>
+        <attribute name="icon">help-about</attribute>
         <attribute name="action">app.about</attribute>
       </item>
     </section>
@@ -16,6 +17,7 @@
     <section>
       <item>
         <attribute name="label" translatable="yes">_quit</attribute>
+        <attribute name="icon">application-exit</attribute>
         <attribute name="action">app.quit</attribute>
       </item>
     </section>
@@ -26,18 +28,22 @@
       <section>
         <item>
           <attribute name="label" translatable="yes">_new file</attribute>
+          <attribute name="icon">document-new</attribute>
           <attribute name="action">app.file_new</attribute>
         </item>
         <item>
           <attribute name="label" translatable="yes">_open file</attribute>
+          <attribute name="icon">document-open</attribute>
           <attribute name="action">app.file_open</attribute>
         </item>
         <item>
           <attribute name="label" translatable="yes">_save file</attribute>
+          <attribute name="icon">document-save</attribute>
           <attribute name="action">app.file_save</attribute>
         </item>
         <item>
           <attribute name="label" translatable="yes">save into new _file</attribute>
+          <attribute name="icon">document-save-as</attribute>
           <attribute name="action">app.file_rename</attribute>
         </item>
       </section>
@@ -100,21 +106,25 @@
           <section>
             <item>
               <attribute name="label" translatable="yes">_before</attribute>
+              <attribute name="icon">go-up</attribute>
               <attribute name="action">app.tree_new_before</attribute>
               <attribute name="accel"><![CDATA[<Control>Left]]></attribute>
             </item>
             <item>
               <attribute name="label" translatable="yes">_after</attribute>
+              <attribute name="icon">go-down</attribute>
               <attribute name="action">app.tree_new_after</attribute>
               <attribute name="accel"><![CDATA[<Control>Right]]></attribute>
             </item>
             <item>
               <attribute name="label" translatable="yes">_first</attribute>
+              <attribute name="icon">go-top</attribute>
               <attribute name="action">app.tree_new_first</attribute>
               <attribute name="accel"><![CDATA[<Control>Up]]></attribute>
             </item>
             <item>
               <attribute name="label" translatable="yes">_last</attribute>
+              <attribute name="icon">go-bottom</attribute>
               <attribute name="action">app.tree_new_last</attribute>
               <attribute name="accel"><![CDATA[<Control>Down]]></attribute>
             </item>
@@ -125,11 +135,13 @@
           <section>
             <item>
               <attribute name="label" translatable="yes">_first</attribute>
+              <attribute name="icon">go-top</attribute>
               <attribute name="action">app.tree_new_child_first</attribute>
               <attribute name="accel"><![CDATA[<Shift><Control>Up]]></attribute>
             </item>
             <item>
               <attribute name="label" translatable="yes">_last</attribute>
+              <attribute name="icon">go-bottom</attribute>
               <attribute name="action">app.tree_new_child_last</attribute>
               <attribute name="accel"><![CDATA[<Shift><Control>Down]]></attribute>
             </item>
@@ -137,6 +149,7 @@
         </submenu>
         <item>
           <attribute name="label" translatable="yes">_delete branch</attribute>
+          <attribute name="icon">edit-delete</attribute>
           <attribute name="action">app.tree_delete</attribute>
           <attribute name="accel"><![CDATA[<Shift><Control>Delete]]></attribute>
         </item>
@@ -153,11 +166,13 @@
       <section>
         <item>
           <attribute name="label" translatable="yes">_undo</attribute>
+          <attribute name="icon">edit-undo</attribute>
           <attribute name="action">app.note_undo</attribute>
           <attribute name="accel"><![CDATA[<Ctrl>Z]]></attribute>
         </item>
         <item>
           <attribute name="label" translatable="yes">_redo</attribute>
+          <attribute name="icon">edit-redo</attribute>
           <attribute name="action">app.note_redo</attribute>
           <attribute name="accel"><![CDATA[<Shift><Ctrl>Z]]></attribute>
         </item>
