@@ -157,7 +157,7 @@ def Q_cross_comp_src_arch_builder_I_action( target, source, env ):
 	h = ' '.join( Q_flags_I_to_includes( env.Split( env[ 'INCLUDES' ] ) + h ))
 	with open( env[ 'variant_dir' ] +'/Makefile', 'w' ) as w:
 		w.write( env[ 'EXE' ] +'_l$(MARCH): '+ ' '.join(files) \
-		  +"\n\t"+'clang -Qunused-arguments -pipe -fwrapv -march=$(MARCH) -flto -emit-llvm -Ofast -fvisibility=hidden -Wl,-E,--gc-sections -s -Wfatal-errors -Wall -Wno-parentheses '+ ' '.join( map( Q_defines_I_gcc_string_I_map, env[ 'CPPDEFINES' ] )) +' $$( pkg-config --cflags --libs '+ env[ 'PKGS' ] +' ) -iquote. '+ h +' -o $@'+ c \
+		  +"\n\t"+'clang -Qunused-arguments -pipe -fwrapv -march=$(MARCH) -flto -emit-llvm -Ofast -fvisibility=hidden -Wl,-E,--gc-sections -Wfatal-errors -Wall -Wno-parentheses '+ ' '.join( map( Q_defines_I_gcc_string_I_map, env[ 'CPPDEFINES' ] )) +' $$( pkg-config --cflags --libs '+ env[ 'PKGS' ] +' ) -iquote. '+ h +' -o $@'+ c \
 		)
 	subprocess.check_call( [ 'tar', 'caf', str( target[0] ), '--transform', 's`^.*/``', '--' ] + map( str, source ) + [ env[ 'variant_dir' ] +'/Makefile' ] )
 #------------------------------------------------------------------------------
