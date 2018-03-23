@@ -1,5 +1,8 @@
 //==============================================================================
-gboolean E_undo_S_join_broken = no;
+unsigned E_undo_Q_note_I_idle_join_break_S_timeout = 2000;
+unsigned E_undo_Q_note_I_idle_join_break_S = 0;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bool E_undo_S_join_broken = no;
 //=============================================================================
 void
 E_undo_Q_note_Z_gtk_X_insert_text( GtkTextBuffer *text_buffer
@@ -32,8 +35,11 @@ E_undo_Q_note_Z_gtk_X_insert_text( GtkTextBuffer *text_buffer
     }
     int length = g_utf8_strlen( text, -1 );
     int p = gtk_text_iter_get_offset(location);
-    gboolean join_broken = E_undo_S_join_broken;
+    bool join_broken = E_undo_S_join_broken;
     E_undo_S_join_broken = no;
+    if( E_undo_Q_note_I_idle_join_break_S )
+        g_source_remove( E_undo_Q_note_I_idle_join_break_S );
+    E_undo_Q_note_I_idle_join_break_S = g_timeout_add( E_undo_Q_note_I_idle_join_break_S_timeout, E_undo_Q_note_I_idle_join_break, null );
     if( data->undo_array->len
     && !join_broken
     ){  struct E_undo_Q_note_Z_action_data *undo_1 = &g_array_index( data->undo_array, struct E_undo_Q_note_Z_action_data, data->undo_array->len - 1 );
@@ -116,8 +122,11 @@ E_undo_Q_note_Z_gtk_X_delete_range( GtkTextBuffer *text_buffer
     int b = gtk_text_iter_get_offset(end);
     J_order(int,a,b);
     char *text = gtk_text_iter_get_text( start, end );
-    gboolean join_broken = E_undo_S_join_broken;
+    bool join_broken = E_undo_S_join_broken;
     E_undo_S_join_broken = no;
+    if( E_undo_Q_note_I_idle_join_break_S )
+        g_source_remove( E_undo_Q_note_I_idle_join_break_S );
+    E_undo_Q_note_I_idle_join_break_S = g_timeout_add( E_undo_Q_note_I_idle_join_break_S_timeout, E_undo_Q_note_I_idle_join_break, null );
     if( data->undo_array->len
     && !join_broken
     ){  struct E_undo_Q_note_Z_action_data *undo = &g_array_index( data->undo_array, struct E_undo_Q_note_Z_action_data, data->undo_array->len - 1 );
@@ -143,6 +152,13 @@ E_undo_Q_note_Z_gtk_X_delete_range( GtkTextBuffer *text_buffer
       , .u.text = text
       })
     );
+}
+gboolean
+E_undo_Q_note_I_idle_join_break(
+  gpointer data
+){  E_undo_S_join_broken = yes;
+    E_undo_Q_note_I_idle_join_break_S = 0;
+    return G_SOURCE_REMOVE;
 }
 void
 E_undo_Q_note_Z_gtk_I_undo( GSimpleAction *action

@@ -126,7 +126,7 @@ E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete( GtkTreeDragSource *store
     if( G_OBJECT_TYPE(store) == GTK_TYPE_TREE_STORE )
     {   int n = gtk_notebook_get_n_pages( E_note_tab_Q_note_tab_S );
         for( int i = 0; i != n; i++ )
-        {   gboolean continue_ = false;
+        {   bool continue_ = false;
             struct E_note_tab_Q_ext_data_Z *note_tab_ext_data = &g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, i );
             GtkTreeSelection *selection;
             GtkTreeModel *model;
@@ -177,7 +177,7 @@ E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete_I( void *data
     gtk_tree_selection_select_path( data_->selection, data_->path_ );
     gtk_tree_path_free( data_->path_ );
     g_free( data_ );
-    return no;
+    return G_SOURCE_REMOVE;
 }
 //-----------------------------------------------------------------------------
 gboolean
