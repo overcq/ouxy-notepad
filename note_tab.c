@@ -29,6 +29,14 @@ unsigned E_note_tab_I_kbd_focus_wa_S = 0;
 bool E_note_tab_I_kbd_focus_wa_U_ignore = no;
 #endif
 //=============================================================================
+gint64
+E_note_tab_I_uniq_date_uid( gint64 d
+){  while( g_hash_table_contains( E_file_S_uids, &d ))
+        d++;
+    g_hash_table_add( E_file_S_uids, &d );
+    return d;
+}
+//==============================================================================
 void
 E_note_tab_I_unignore_change( void
 ){  E_main_Z_gtk_I_process_events();
@@ -42,7 +50,14 @@ E_note_tab_Q_note_tab_Z_gtk_X_switch_page( GtkNotebook *notebook
 , unsigned tab
 , void *data
 ){  if( !E_note_tab_U_ignore_change )
-        g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, E_note_tab_Q_note_tab_S_current_tab ).focused = gtk_window_get_focus( E_main_Q_window_S );
+    {   struct E_note_tab_Q_ext_data_Z *note_tab_ext_data = &g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, E_note_tab_Q_note_tab_S_current_tab );
+        GtkWidget *focused = gtk_window_get_focus( E_main_Q_window_S );
+        if( focused != note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ]
+        && focused != note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ]
+        )
+            focused = note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ];
+        g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, E_note_tab_Q_note_tab_S_current_tab ).focused = focused;
+    }
     E_note_tab_Q_note_tab_S_current_tab = tab;
     if( !E_note_tab_U_ignore_change )
     {   E_note_tab_Q_note_tab_Z_gtk_X_switch_page_I_focus();
@@ -221,7 +236,7 @@ E_note_tab_Q_tree_Z_gtk_I_set_cursor( GtkTreeView *tree_view
 , GtkTreePath *path
 ){  E_note_tab_Q_tree_Z_gtk_I_set_cursor_0( tree_view, path );
     E_main_Z_gtk_I_process_events();
-    gtk_tree_view_set_cursor( tree_view, path, null, no );
+    gtk_tree_view_set_cursor( tree_view, path, gtk_tree_view_get_column( tree_view, 0 ), no );
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #ifdef C_kdb_focus_wa
@@ -359,14 +374,11 @@ E_note_tab_Q_notes_tree_Z_gtk_X_selection_changed( GtkTreeSelection *selection
             , E_note_tab_Q_tree_Z_column_S_ext_data, &ext_data
             , -1
             );
-            if( ext_data->date_uid )
-            {   GDateTime *date = g_date_time_new_from_unix_local( ext_data->date_uid / 1000000 );
-                char *label = g_date_time_format( date, "%Y‒%-m‒%-d %A %-H:%M" );
-                gtk_label_set_text( note_tab_ext_data->note_date, label );
-                g_free(label);
-                g_date_time_unref(date);
-            }else
-                gtk_label_set_text( note_tab_ext_data->note_date, "unknown" );
+            GDateTime *date = g_date_time_new_from_unix_local( ext_data->date_uid / 1000000 );
+            char *label = g_date_time_format( date, "%Y‒%-m‒%-d %A %-H:%M" );
+            gtk_label_set_text( note_tab_ext_data->note_date, label );
+            g_free(label);
+            g_date_time_unref(date);
             E_note_tab_Q_note_I_clear_search( text_buffer );
             if( !note_tab_ext_data->Q_notes_tree_U_selected )
             {   gtk_widget_show(( void * )note_tab_ext_data->note_attr );
@@ -1029,7 +1041,7 @@ E_note_tab_Q_tree_Q_branch_M( GtkTreeView *tree_view
         ext_data = null;
     }else
     {   ext_data = E_note_tab_Q_note_Z_ext_data_M();
-        ext_data->date_uid = g_get_real_time();
+        ext_data->date_uid = E_note_tab_I_uniq_date_uid( g_get_real_time() );
         GtkTreeIter iter, old_iter;
         if( gtk_tree_model_get_iter_first( tree_model, &iter ))
             while(empty)

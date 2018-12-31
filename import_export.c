@@ -403,7 +403,7 @@ E_ie_Q_xml_file_I_import_I_tree_I_note( GDataInputStream *in
         }
         g_free(s);
     }
-    ( *( struct E_note_tab_Q_note_Z_ext_data ** ) ext_data )->date_uid = d;
+    ( *( struct E_note_tab_Q_note_Z_ext_data ** ) ext_data )->date_uid = E_note_tab_I_uniq_date_uid(d);
     if(success)
     {   char *s = E_ie_I_read_string( in, no );
         if( !s
@@ -486,7 +486,7 @@ Tag_dt:     if( strcmp( s, "DT style=\"font-weight: bold;\"" ))
             GtkTreeIter new_iter;
             GtkTextBuffer *note_buffer = E_note_tab_Q_note_Q_buffer_M( "" );
             struct E_note_tab_Q_note_Z_ext_data *ext_data = E_note_tab_Q_note_Z_ext_data_M();
-            ext_data->date_uid = 0;
+            ext_data->date_uid = E_note_tab_I_uniq_date_uid(0);
             gtk_tree_store_insert_with_values( tree_store
             , &new_iter
             , ( toplevel ? null : &iter )

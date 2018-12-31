@@ -130,7 +130,7 @@ E_main_Z_gtk_Q_program_I_about( GSimpleAction *action
     g_free( s_lgpl );
     gtk_show_about_dialog( E_main_Q_window_S
     , "program-name", "ouxy notepad"
-    , "version", "0.14 (" __DATE__ ")"
+    , "version", "0.16 (" __DATE__ ")"
     , "comments", "where an infinity ends or begins…"
     , "copyright", "©2013‐2018 overcq"
     , "authors", ( char *[] ){ "ocq@tutanota.com (overcq)", null }
@@ -203,6 +203,7 @@ main(
     gtk_window_maximize( E_main_Q_window_S );
     g_signal_connect( E_main_Q_app_S, "activate", ( void * )E_main_Z_gtk_Q_program_X_activate, null );
     ///dane główne programu
+    E_file_S_uids = g_hash_table_new( g_int64_hash, g_int64_equal );
     const char *dir = g_get_user_special_dir( G_USER_DIRECTORY_DOCUMENTS );
     if( !dir )
         dir = g_get_home_dir();

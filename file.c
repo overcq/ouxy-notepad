@@ -12,6 +12,7 @@ unsigned E_file_S_autosave_id = 0; //identyfikator zadania (“source”) pętli
 GFile *E_file_S = null;
 char *E_file_S_etag = null;
 char *E_file_Q_dialog_S_last_directory;
+GHashTable *E_file_S_uids;
 //=============================================================================
 bool
 E_file_R_etag_changed( void
@@ -352,6 +353,8 @@ E_file_Q_file_I_load( char *path
         g_data_input_stream_set_byte_order( in_data, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN );
         E_note_tab_U_ignore_change = yes;
         E_note_tab_Q_note_tab_P_clear();
+        g_hash_table_destroy( E_file_S_uids );
+        E_file_S_uids = g_hash_table_new( g_int64_hash, g_int64_equal );
         success = E_file_Q_file_I_load_I_tree( in_data, ( void * )E_note_tab_Q_note_tab_S_books_tree_store, E_file_Q_file_I_load_I_tree_I_notes );
         if( success
         && E_file_S_loaded_version > 4
@@ -518,10 +521,10 @@ E_file_Q_file_I_load_I_tree_I_note( GDataInputStream *in
     g_free(s);
     *ext_data = E_note_tab_Q_note_Z_ext_data_M();
     if( E_file_S_loaded_version > 5 )
-    {   ( *( struct E_note_tab_Q_note_Z_ext_data ** ) ext_data )->date_uid = g_data_input_stream_read_int64( in, null, &E_error_S );
-        E_error_J_return_0( "write to the file" );
+    {   ( *( struct E_note_tab_Q_note_Z_ext_data ** ) ext_data )->date_uid = E_note_tab_I_uniq_date_uid( g_data_input_stream_read_int64( in, null, &E_error_S ));
+        E_error_J_return_0( "read from the file" );
     }else
-        ( *( struct E_note_tab_Q_note_Z_ext_data ** ) ext_data )->date_uid = 0;
+        ( *( struct E_note_tab_Q_note_Z_ext_data ** ) ext_data )->date_uid = E_note_tab_I_uniq_date_uid(0);
     return success;
 }
 char *

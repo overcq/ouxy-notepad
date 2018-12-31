@@ -384,7 +384,7 @@ E_dnd_Z_gtk_Q_tree_drag_dest_I_drag_data_received( GtkTreeDragDest *store
               }else
               {   object = E_note_tab_Q_note_Q_buffer_M(null);
                   ext_data = E_note_tab_Q_note_Z_ext_data_M();
-                  ext_data->date_uid = g_get_real_time(); //NDFN brak zabezpieczenia przed powtórzeniem jednej wartości.
+                  ext_data->date_uid = E_note_tab_I_uniq_date_uid( g_get_real_time() );
               }
               gtk_tree_store_set(( void * )store
               , &iter
@@ -456,14 +456,15 @@ E_dnd_Z_gtk_Q_tree_drag_dest_I_drag_data_received( GtkTreeDragDest *store
                           }
                       }
               }else if(( void * )store == E_note_tab_Q_note_tab_S_books_tree_store ) //z drzewa notatek do drzewa ksiąg.
-              {   struct E_note_tab_Q_note_Z_ext_data *note_data;
+              {   struct E_note_tab_Q_note_Z_ext_data *ext_data;
                   gtk_tree_model_get( E_dnd_Z_gtk_Q_tree_drag_source_S_store
                   , &from_iter
                   , E_note_tab_Q_tree_Z_column_S_title, &title
-                  , E_note_tab_Q_tree_Z_column_S_ext_data, &note_data
+                  , E_note_tab_Q_tree_Z_column_S_ext_data, &ext_data
                   , -1
                   );
-                  E_note_tab_Q_note_Z_ext_data_W( note_data );
+                  g_hash_table_remove( E_file_S_uids, &( *( struct E_note_tab_Q_note_Z_ext_data ** ) ext_data )->date_uid );
+                  E_note_tab_Q_note_Z_ext_data_W( ext_data );
                   object = E_note_tab_Q_tree_Q_store_M();
                   gtk_tree_store_set(( void * )store
                   , &iter
@@ -484,10 +485,10 @@ E_dnd_Z_gtk_Q_tree_drag_dest_I_drag_data_received( GtkTreeDragDest *store
                           gtk_tree_model_get( E_dnd_Z_gtk_Q_tree_drag_source_S_store
                           , &from_iter
                           , E_note_tab_Q_tree_Z_column_S_title, &title
-                          , E_note_tab_Q_tree_Z_column_S_ext_data, &note_data
+                          , E_note_tab_Q_tree_Z_column_S_ext_data, &ext_data
                           , -1
                           );
-                          E_note_tab_Q_note_Z_ext_data_W( note_data );
+                          E_note_tab_Q_note_Z_ext_data_W( ext_data );
                           object = E_note_tab_Q_tree_Q_store_M();
                           gtk_tree_store_set(( void * )store
                           , &iter
@@ -522,7 +523,7 @@ E_dnd_Z_gtk_Q_tree_drag_dest_I_drag_data_received( GtkTreeDragDest *store
                   );
                   object = E_note_tab_Q_note_Q_buffer_M(null);
                   struct E_note_tab_Q_note_Z_ext_data *ext_data = E_note_tab_Q_note_Z_ext_data_M();
-                  ext_data->date_uid = 0;
+                  ext_data->date_uid = E_note_tab_I_uniq_date_uid( g_get_real_time() );
                   gtk_tree_store_set(( void * )store
                   , &iter
                   , E_note_tab_Q_tree_Z_column_S_title, title
@@ -547,7 +548,7 @@ E_dnd_Z_gtk_Q_tree_drag_dest_I_drag_data_received( GtkTreeDragDest *store
                           );
                           object = E_note_tab_Q_note_Q_buffer_M(null);
                           struct E_note_tab_Q_note_Z_ext_data *ext_data = E_note_tab_Q_note_Z_ext_data_M();
-                          ext_data->date_uid = 0;
+                          ext_data->date_uid = E_note_tab_I_uniq_date_uid( g_get_real_time() );
                           gtk_tree_store_set(( void * )store
                           , &iter
                           , E_note_tab_Q_tree_Z_column_S_title, title

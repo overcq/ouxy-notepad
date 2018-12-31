@@ -180,7 +180,6 @@
     </submenu>
   </menu>
   <object class="GtkApplicationWindow" id="Q_builder_Z_window">
-    <property name="type">GTK_WINDOW_TOPLEVEL</property>
     <property name="role">main</property>
     <property name="default-width">600</property>
     <property name="default-height">400</property>
