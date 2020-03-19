@@ -1,4 +1,4 @@
-//=============================================================================
+/******************************************************************************/
 GError *E_error_S = null;
 GtkTreeView *E_error_Q_info_bar_S_error_list;
 GtkTreeModel *E_error_Q_info_bar_S_list_store = null;
@@ -60,4 +60,4 @@ E_error_Z_gtk_Q_program_I_err_clear( GSimpleAction *action
         gtk_tree_view_set_model( E_error_Q_info_bar_S_error_list, E_error_Q_info_bar_S_list_store = null );
     }
 }
-//=============================================================================
+/******************************************************************************/

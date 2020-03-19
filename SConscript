@@ -1,7 +1,6 @@
-﻿#==============================================================================
+﻿#*******************************************************************************
 import binascii
 import os
-import popen2
 import random
 import re
 import subprocess
@@ -9,8 +8,8 @@ import subprocess
 Import( 'env' )
 env.Append( CROSS_COMP_SRC_ARCH='0.tar.xz' )
 obfuscate = {}
-Q_random_I_id_S_begin_source = map( chr, random.sample( range( 97, 122 ) + [ 95 ] + range( 65, 90 ), 4 ))
-Q_random_I_id_S_trail_source = range( 97, 122 ) + range( 48, 57 ) + range( 65, 90 ) + [ 95 ]
+Q_random_I_id_S_begin_source = list( map( chr, random.sample( list( range( 97, 122 )) + [ 95 ] + list( range( 65, 90 )), 4 )))
+Q_random_I_id_S_trail_source = list( range( 97, 122 )) + list( range( 48, 57 )) + list( range( 65, 90 )) + [ 95 ]
 Q_random_I_id_S_chosen = [ '' ]
 #==============================================================================
 env.Alias( 'build', env[ 'EXE' ] )
@@ -34,11 +33,11 @@ def Q_random_I_id():
 #------------------------------------------------------------------------------
 def Q_h_builder_I_action( target, source, env ):
 	global obfuscate
-	d = '_'+ binascii.b2a_base64( str( source[0] )).rstrip( "=\n" ) +'_H'
+	d = '_'+ str( binascii.b2a_base64( bytes( str( source[0] ), 'UTF-8' ), newline = False ), 'ASCII' ).rstrip( '=' ) +'_H'
 	s_new = '#ifndef '+ d +"\n#define "+ d +"\n"
-	r, w = popen2.popen2( [ 'makeheaders', '-h', '--', str( source[0] ) ] )
-	w.close()
-	for l in r:
+	proc = subprocess.Popen( [ 'makeheaders', '-h', '--', str( source[0] ) ], stdin = subprocess.PIPE, stdout = subprocess.PIPE )
+	for l in proc.stdout:
+		l = str( l, 'UTF-8' )
 		if env[ 'obfuscation' ]:
 			if l.startswith( '_EXPORT_OBFUSCATE ' ):
 				name = l.partition( '(' )[0].rpartition( ' ' )[2]
@@ -58,7 +57,6 @@ def Q_h_builder_I_action( target, source, env ):
 				s_new += '#define '+ name +' "'+ name +"\"\n"
 		else:
 			s_new += l
-	r.close()
 	s_new += '#endif'
 	try:
 		with open( str( target[0] )) as r:
@@ -176,6 +174,7 @@ def Q_flags_I_to_includes(headers):
 	a = []
 	for f in headers:
 		a += [ '-include', str(f) ]
+	print(a)
 	return a
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 uis = env.Glob( '*.ui0', True, True, True )
@@ -199,10 +198,10 @@ if str( Dir( '.' ).path ) == '.build_dist':
 	env.Clean( env[ 'CROSS_COMP_SRC_ARCH' ], 'Makefile' )
 #------------------------------------------------------------------------------
 env.Append( CPPDEFINES=[ ( '_EXPORT', "'"'__attribute__((visibility("default")))'"'" ), ( '_EXPORT_OBFUSCATE', '_EXPORT' ), ( "'"'OBFUSCATE(a)'"'", '' ), ( 'FALSE', '0' ), ( 'TRUE', '1' ) ] )
-headers = map( Q_str_I_to_filename, headers )
+headers = list( map( Q_str_I_to_filename, headers ))
 env.Append( CPPFLAGS=Q_flags_I_to_includes( env.Split( env[ 'INCLUDES' ] ) + headers ))
 env.Append( CCFLAGS=env.Split( '-flto -emit-llvm -fvisibility=hidden -iquote'+ str( Dir( '.' ).path ) +' -iquote.' ))
 env.ParseFlags( '-I'+ os.environ[ 'HOME' ] +'/.local/include -L'+ os.environ[ 'HOME' ] +'/.local/lib' )
 env.ParseConfig( 'pkg-config --cflags --libs '+ env[ 'PKGS' ] )
 env.Append( LINKFLAGS=env.Split( '-flto -Wl,--as-needed,-E,--gc-sections,-X' ))
-#==============================================================================
+#*******************************************************************************

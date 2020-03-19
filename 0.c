@@ -1,4 +1,4 @@
-//=============================================================================
+/******************************************************************************/
 OBFUSCATE( Q_builder_Z_app_menu );
 OBFUSCATE( Q_builder_Z_app_menu_bar );
 OBFUSCATE( Q_builder_Z_window );
@@ -132,7 +132,7 @@ E_main_Z_gtk_Q_program_I_about( GSimpleAction *action
     , "program-name", "ouxy notepad"
     , "version", "0.16 (" __DATE__ ")"
     , "comments", "where an infinity ends or begins…"
-    , "copyright", "©2013‐2018 overcq"
+    , "copyright", "©2013‐2020 overcq"
     , "authors", ( char *[] ){ "ocq@tutanota.com (overcq)", null }
     , "license", s_licence
     , null
@@ -232,4 +232,4 @@ E_main_I_run_post_init( void *data
 ){  E_note_tab_U_ignore_change = no;
     return G_SOURCE_REMOVE;
 }
-//=============================================================================
+/******************************************************************************/

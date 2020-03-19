@@ -1,4 +1,4 @@
-//=============================================================================
+/******************************************************************************/
 GtkClipboard *E_clipboard_S_0, *E_clipboard_S_1, *E_clipboard_S_2;
 GdkAtom E_dnd_Q_tree_Z_data_type_S_native, E_dnd_Q_tree_Z_data_type_S_text;
 const GtkTargetEntry E_clipboard_Q_tree_Q_1_S_data_types[1] =
@@ -670,4 +670,4 @@ E_dnd_Z_gtk_Q_tree_drag_dest_I_drag_data_received( GtkTreeDragDest *store
 End:g_signal_handlers_unblock_matched( store, G_SIGNAL_MATCH_DATA, 0, 0, null, null, null );
     return yes;
 }
-//=============================================================================
+/******************************************************************************/
