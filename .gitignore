@@ -1,4 +1,4 @@
 /.build/
-/.build_dist/
+/.build-dist/
 /.dist/
 /.sconsign.dblite

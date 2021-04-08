@@ -639,7 +639,7 @@ E_note_tab_Q_tree_Z_gtk_I_delete( GSimpleAction *action
 int
 E_note_tab_Q_note_tab_M_i( int i
 ){  GtkBuilder *builder = gtk_builder_new();
-    if( !gtk_builder_add_from_file( builder, "note_tab.ui", null ))
+    if( !gtk_builder_add_from_file( builder, "note-tab.ui", null ))
         return -1;
     GtkWidget *note_tab_container = ( void * )gtk_builder_get_object( builder, Q_builder_Z_note_tab_container );
     int tab;

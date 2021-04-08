@@ -192,7 +192,7 @@ for f in sources:
 	env.Depends( Q_str_I_to_suffix( f, 'o' ), headers )
 env.Program( env[ 'EXE' ], sources )
 #------------------------------------------------------------------------------
-if str( Dir( '.' ).path ) == '.build_dist':
+if str( Dir( '.' ).path ) == '.build-dist':
 	env.Command( env[ 'CROSS_COMP_SRC_ARCH' ], sources + headers, Q_cross_comp_src_arch_builder_I_action )
 	env.Depends( env[ 'CROSS_COMP_SRC_ARCH' ], env[ 'EXE' ] )
 	env.Clean( env[ 'CROSS_COMP_SRC_ARCH' ], 'Makefile' )
