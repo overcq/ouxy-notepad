@@ -123,6 +123,7 @@ gboolean
 E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_delete( GtkTreeDragSource *store
 , GtkTreePath *path
 ){  GtkTreeIter iter;
+    store = ( void * )E_dnd_Z_gtk_Q_tree_drag_source_S_store;
     if( G_OBJECT_TYPE(store) == GTK_TYPE_TREE_STORE )
     {   int n = gtk_notebook_get_n_pages( E_note_tab_Q_note_tab_S );
         for( int i = 0; i != n; i++ )

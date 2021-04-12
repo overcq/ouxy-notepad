@@ -2,7 +2,7 @@
 //utrzymywanie powiązanego pliku przez sumę kontrolną dla zapisu inkrementacyjnego.
 //samoczynny zapis inkrementacyjny, taśmowy, w celu oszczędzania nośnika danych.
 //=============================================================================
-const char *E_file_S_default_filename = "notepad_gj3d";
+const char *E_file_S_default_filename = "notepad-ocq";
 const char E_file_S_header[] = "gj3d\0notepad";
 const gsize E_file_S_buffer_size = 1024 * 128;
 const unsigned E_file_S_saved_version = 6;
