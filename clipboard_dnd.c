@@ -12,10 +12,10 @@ const GtkTargetEntry E_dnd_Q_tree_S_data_types[2] =
 GtkTreeModel *E_dnd_Z_gtk_Q_tree_drag_source_S_store;
 int E_dnd_Z_gtk_Q_tree_drag_source_S_tab;
 GtkTreeIter E_dnd_Z_gtk_Q_tree_drag_source_S_books_iter;
-bool E_dnd_Z_gtk_Q_tree_drag_dest_U_gave_data_into_native; ///użycie trybu “move” ‘drag & drop’, ale usuwanie danych źródłowych tylko wtedy, gdy umieszczono je w kształtce notatnika ·w tym· programie.
-bool E_dnd_Z_gtk_Q_tree_drag_source_U_native_checked, E_dnd_Z_gtk_Q_tree_drag_source_S_native_check_result; ///odwraca sprawdzanie, czy można upuścić dane— ze sprawdzania celu na sprawdzanie źródła ‘natywnego’, ale w jedynie dostępnej procedurze wywoływanej dla celu.
+bool E_dnd_Z_gtk_Q_tree_drag_dest_U_gave_data_into_native; // Użycie trybu “move” ‘drag & drop’, ale usuwanie danych źródłowych tylko wtedy, gdy umieszczono je w kształtce notatnika ·w tym· programie.
+bool E_dnd_Z_gtk_Q_tree_drag_source_U_native_checked, E_dnd_Z_gtk_Q_tree_drag_source_S_native_check_result; // Odwraca sprawdzanie, czy można upuścić dane— ze sprawdzania celu na sprawdzanie źródła ‘natywnego’, ale w jedynie dostępnej procedurze wywoływanej dla celu.
 //=============================================================================
-///NDFN dostarcza wszystkie teksty z wiersza, który jest powiązany, a nie tylko widoczne.
+//NDFN Dostarcza wszystkie teksty z wiersza, który jest powiązany, a nie tylko widoczne.
 void
 E_dnd_Z_gtk_Q_tree_Q_clipboard_S_1_I_supply_data( GtkClipboard *clipboard
 , GtkSelectionData *data
@@ -75,13 +75,13 @@ E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_get( GtkTreeDragSource *store
         unsigned char *d = ( unsigned char * )g_strndup( s, n );
         g_free(s);
         struct E_note_tab_Q_ext_data_Z *note_tab_ext_data = &g_array_index( E_note_tab_Q_note_tab_S_ext_data, struct E_note_tab_Q_ext_data_Z, E_dnd_Z_gtk_Q_tree_drag_source_S_tab );
-        ///‘uid’ grupy drzew wymieniającej wewnątrz dane w formacie ‘natywnym’.
+        // ‘uid’ grupy drzew wymieniającej wewnątrz dane w formacie ‘natywnym’.
         if(( void * )store == gtk_tree_view_get_model( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ] )
         || ( void * )store == gtk_tree_view_get_model( note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ] )
         )
-            d[n] = 1; ///grupa drzew ksiąg i notatek
-        //else ///już ma wartość ‛0’ nadaną przez “g_strndup”.
-            //d[n] = 0; ///domyślnie– ‘uid’ nieistniejącej grupy (którą też są wszystkie większe od maksymalnej posiadającej implementację obsługi), co oznacza, że “drag & drop” w formacie ‘natywnym’ jest realizowane tylko wewnątrz jednego drzewa, a inne “drop” nie są realizowane.
+            d[n] = 1; // grupa drzew ksiąg i notatek
+        //else // Już ma wartość ‛0’ nadaną przez “g_strndup”.
+            //d[n] = 0; // Domyślnie– ‘uid’ nieistniejącej grupy (którą też są wszystkie większe od maksymalnej posiadającej implementację obsługi), co oznacza, że “drag & drop” w formacie ‘natywnym’ jest realizowane tylko wewnątrz jednego drzewa, a inne “drop” nie są realizowane.
         gtk_selection_data_set( data
         , E_dnd_Q_tree_Z_data_type_S_native
         , 8
@@ -90,7 +90,7 @@ E_dnd_Z_gtk_Q_tree_drag_source_I_drag_data_get( GtkTreeDragSource *store
         );
         g_free(d);
     }else if( type == E_dnd_Q_tree_Z_data_type_S_text )
-    ///NDFN dostarcza wszystkie teksty z wiersza, który jest powiązany, a nie tylko widoczne.
+    //NDFN Dostarcza wszystkie teksty z wiersza, który jest powiązany, a nie tylko widoczne.
     {   GtkTreeIter iter;
         gtk_tree_model_get_iter(( void * )store, &iter, path );
         int n = gtk_tree_model_get_n_columns(( void * )store );

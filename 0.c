@@ -132,7 +132,7 @@ E_main_Z_gtk_Q_program_I_about( GSimpleAction *action
     , "program-name", "ouxy notepad"
     , "version", "0.16.0.2 (" __DATE__ ")"
     , "comments", "where an infinity ends or begins…"
-    , "copyright", "©2013‐2021 overcq"
+    , "copyright", "©2013‐2022 overcq"
     , "authors", ( char *[] ){ "ocq@tutanota.com (overcq)", null }
     , "license", s_licence
     , null
@@ -146,6 +146,80 @@ E_main_Z_gtk_Q_program_I_quit( GSimpleAction *action
 ){  E_file_Z_gtk_I_save( null, null, null );
     if( !E_file_S_autosave_id )
         gtk_widget_destroy(( void * )E_main_Q_window_S );
+}
+void
+E_main_I_set_accel( void *builder_menu
+){  for( int i = 0; i != g_menu_model_get_n_items( builder_menu ); i++ )
+    {   GMenuLinkIter *iter = g_menu_model_iterate_item_links( builder_menu, i );
+        char *name;
+        GMenuModel *menu;
+        while( g_menu_link_iter_get_next( iter, &name, &menu ))
+        {   for( int i = 0; i != g_menu_model_get_n_items(menu); i++ )
+            {   GMenuLinkIter *iter = g_menu_model_iterate_item_links( menu, i );
+                char *name;
+                GMenuModel *menu;
+                while( g_menu_link_iter_get_next( iter, &name, &menu ))
+                {   for( int i = 0; i != g_menu_model_get_n_items(menu); i++ )
+                    {   GMenuLinkIter *iter = g_menu_model_iterate_item_links( menu, i );
+                        char *name;
+                        GMenuModel *menu2;
+                        while( g_menu_link_iter_get_next( iter, &name, &menu2 ))
+                        {   for( int i = 0; i != g_menu_model_get_n_items(menu2); i++ )
+                            {   GMenuLinkIter *iter = g_menu_model_iterate_item_links( menu2, i );
+                                char *name;
+                                GMenuModel *menu;
+                                while( g_menu_link_iter_get_next( iter, &name, &menu ))
+                                {   for( int i = 0; i != g_menu_model_get_n_items(menu); i++ )
+                                    {   GMenuAttributeIter *iter = g_menu_model_iterate_item_attributes( menu, i );
+                                        char *name;
+                                        GVariant *attr;
+                                        char *action = null;
+                                        char *accel = null;
+                                        while( g_menu_attribute_iter_get_next( iter, &name, &attr ))
+                                        {   char *attr_s = g_variant_get_string( attr, null );
+                                            if( !strcmp( name, "action" ))
+                                                action = g_strdup( attr_s );
+                                            else if( !strcmp( name, "accel" ))
+                                                accel = g_strdup( attr_s );
+                                            g_variant_unref(attr);
+                                        }
+                                        if(accel)
+                                        {   char *accel_tbl[] = { accel, null };
+                                            gtk_application_set_accels_for_action( E_main_Q_app_S, action, &accel_tbl[0] );
+                                            g_free(accel);
+                                        }
+                                        g_free(action);
+                                    }
+                                    g_object_unref(menu);
+                                }
+                            }
+                            g_object_unref(menu2);
+                        }
+                        GMenuAttributeIter *iter2 = g_menu_model_iterate_item_attributes( menu, i );
+                        GVariant *attr;
+                        char *action = null;
+                        char *accel = null;
+                        while( g_menu_attribute_iter_get_next( iter2, &name, &attr ))
+                        {   char *attr_s = g_variant_get_string( attr, null );
+                            if( !strcmp( name, "action" ))
+                                action = g_strdup( attr_s );
+                            else if( !strcmp( name, "accel" ))
+                                accel = g_strdup( attr_s );
+                            g_variant_unref(attr);
+                        }
+                        if(accel)
+                        {   char *accel_tbl[] = { accel, null };
+                            gtk_application_set_accels_for_action( E_main_Q_app_S, action, &accel_tbl[0] );
+                            g_free(accel);
+                        }
+                        g_free(action);
+                    }
+                    g_object_unref(menu);
+                }
+            }
+            g_object_unref(menu);
+        }
+    }
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int
@@ -161,7 +235,7 @@ main(
     E_note_tab_Q_note_tab_S_new_tab_names_list_store = ( void * )E_note_tab_Q_new_tab_names_Q_store_M();
     E_note_tab_Q_note_tab_S_books_tree_store = ( void * )E_note_tab_Q_tree_Q_store_M();
     GtkListStore *list_store = gtk_list_store_new( 1, G_TYPE_INT );
-    ///‘dirty trick’ zamiast utworzenia własnych klas potomnych “GtkTreeStore” i  “GtkListStore”, by zaimplementować globalizowane w tym programie ‘drag and drop’ ‘high‐level’ dla ‟GTK+”.
+    // ‘Dirty trick’ zamiast utworzenia własnych klas potomnych “GtkTreeStore” i  “GtkListStore”, by zaimplementować globalizowane w tym programie ‘drag and drop’ ‘high‐level’ dla ‟GTK+”.
     GtkTreeDragSourceIface *drag_source_iface_1 = GTK_TREE_DRAG_SOURCE_GET_IFACE( E_note_tab_Q_note_tab_S_books_tree_store );
     GtkTreeDragSourceIface *drag_source_iface_2 = GTK_TREE_DRAG_SOURCE_GET_IFACE( list_store );
     drag_source_iface_2->row_draggable = drag_source_iface_1->row_draggable = E_dnd_Z_gtk_Q_tree_drag_source_I_row_draggable;
@@ -172,13 +246,15 @@ main(
     drag_dest_iface_2->row_drop_possible = drag_dest_iface_1->row_drop_possible = E_dnd_Z_gtk_Q_tree_drag_dest_I_row_drop_possible;
     drag_dest_iface_2->drag_data_received = drag_dest_iface_1->drag_data_received = E_dnd_Z_gtk_Q_tree_drag_dest_I_drag_data_received;
     g_object_unref( list_store );
-    ///okno główne
+    // okno główne
     E_note_tab_U_ignore_change = yes;
     GtkBuilder *builder = gtk_builder_new();
     if( !gtk_builder_add_from_file( builder, "window.ui", null ))
         return -1;
     gtk_application_set_app_menu( E_main_Q_app_S, ( void * )gtk_builder_get_object( builder, Q_builder_Z_app_menu ));
-    gtk_application_set_menubar( E_main_Q_app_S, ( void * )gtk_builder_get_object( builder, Q_builder_Z_app_menu_bar ));
+    GMenuModel *builder_menu = ( void * )gtk_builder_get_object( builder, Q_builder_Z_app_menu_bar );
+    gtk_application_set_menubar( E_main_Q_app_S, builder_menu );
+    E_main_I_set_accel( builder_menu );
     E_main_Q_window_S = ( void * )gtk_builder_get_object( builder, Q_builder_Z_window );
     gtk_application_add_window( E_main_Q_app_S, E_main_Q_window_S );
     E_main_Q_info_bar_S = ( void * )gtk_builder_get_object( builder, Q_builder_Z_info_bar );
@@ -194,15 +270,15 @@ main(
     E_clipboard_S_2 = gtk_widget_get_clipboard(( void * )E_main_Q_window_S, GDK_SELECTION_SECONDARY );
     E_dnd_Q_tree_Z_data_type_S_native = gdk_atom_intern_static_string( E_dnd_Q_tree_Z_data_type_S_native_S_atom_name );
     E_dnd_Q_tree_Z_data_type_S_text = gdk_atom_intern_static_string( E_dnd_Q_tree_Z_data_type_S_text_S_atom_name );
-    ///dane oddzielne okna głównego
+    // dane oddzielne okna głównego
     E_note_tab_Q_note_tab_S_ext_data = g_array_sized_new( no, no, sizeof( struct E_note_tab_Q_ext_data_Z ), 1 );
     E_file_Q_dialog_S_last_directory = g_strdup( "" );
-    ///uruchomienie okna głównego
+    // uruchomienie okna głównego
     gtk_widget_show_all(( void * )E_main_Q_window_S );
     gtk_widget_hide(( void * )E_main_Q_info_bar_S );
     gtk_window_maximize( E_main_Q_window_S );
     g_signal_connect( E_main_Q_app_S, "activate", ( void * )E_main_Z_gtk_Q_program_X_activate, null );
-    ///dane główne programu
+    // dane główne programu
     E_file_S_uids = g_hash_table_new( g_int64_hash, g_int64_equal );
     const char *dir = g_get_user_special_dir( G_USER_DIRECTORY_DOCUMENTS );
     if( !dir )
@@ -221,7 +297,7 @@ main(
         E_main_Q_window_P_title();
     }
     g_free(filename);
-    ///pętla wykonywania
+    // pętla wykonywania
     gtk_widget_grab_focus(( void * )E_note_tab_Q_note_tab_S );
     g_timeout_add_full( G_PRIORITY_LOW, 183, E_main_I_run_post_init, null, null );
     return g_application_run(( void * )E_main_Q_app_S, argc, argv );

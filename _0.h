@@ -55,7 +55,7 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 typedef N bool;
 //=============================================================================
-///musi być ta nazwa dla ‘native’, ponieważ ‟gtk+” wykonuje wymagane mechanizmy wewnętrzne podczas obsługi ‘drag & drop’.
+// Musi być ta nazwa dla ‘native’, ponieważ ‟gtk+” wykonuje wymagane mechanizmy wewnętrzne podczas obsługi ‘drag & drop’.
 #define E_dnd_Q_tree_Z_data_type_S_native_S_atom_name "GTK_TREE_MODEL_ROW"
 #define E_dnd_Q_tree_Z_data_type_S_text_S_atom_name "UTF8_STRING"
 //==============================================================================

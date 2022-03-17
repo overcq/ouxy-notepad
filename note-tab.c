@@ -21,8 +21,8 @@ GtkTextTagTable *E_note_tab_Q_note_S_tag_table;
 GtkTextTag *E_note_tab_Q_note_Z_tag_S_search;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 GArray *E_note_tab_Q_note_tab_S_ext_data;
-int E_note_tab_Q_note_tab_S_current_tab; ///wartość ustawiana dla systemu procedur ‟gtk+”, w ‹raporcie› ‟gtk+”, czyli po wizualnym zaliczeniu przez ‟gtk+”, a nie dla systemu procedur bezpośrednich tego programu, gdy już było i tak wiadomo, że karta jest usuwana.
-bool E_note_tab_U_ignore_change; ///ponieważ jest dokonywana nie przez operatora, nie w modyfikacji danych.
+int E_note_tab_Q_note_tab_S_current_tab; // Wartość ustawiana dla systemu procedur ‟gtk+”, w ‹raporcie› ‟gtk+”, czyli po wizualnym zaliczeniu przez ‟gtk+”, a nie dla systemu procedur bezpośrednich tego programu, gdy już było i tak wiadomo, że karta jest usuwana.
+bool E_note_tab_U_ignore_change; // Ponieważ jest dokonywana nie przez operatora, nie w modyfikacji danych.
 unsigned E_note_tab_Q_note_tab_Z_gtk_X_switch_page_I_post_focus_S = 0;
 #ifdef C_kdb_focus_wa
 unsigned E_note_tab_I_kbd_focus_wa_S = 0;
@@ -240,7 +240,7 @@ E_note_tab_Q_tree_Z_gtk_I_set_cursor( GtkTreeView *tree_view
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #ifdef C_kdb_focus_wa
-///WA (2) wymuszenie wyświetlenia wskaźnika klawiatury mimo niewyłączalnego gównianego ‚smart’ ukrywania przez ‟GTK+”.
+//WA (2) wymuszenie wyświetlenia wskaźnika klawiatury mimo niewyłączalnego gównianego ‚smart’ ukrywania przez ‟GTK+”.
 void
 E_note_tab_I_kbd_focus_wa_P_enabled( bool b
 ){  if(b)
@@ -257,7 +257,7 @@ E_note_tab_I_kbd_focus_wa_I( void *data
     if( widget != ( void * )note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ]
     && widget != ( void * )note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_notes ]
     )
-        goto End; ///to zakończenie jest otwarte na “E_note_tab_U_ignore_change”, ale też na inne błędy (czasowe) i dlatego powoduje brak determinizmu zaznaczania.
+        goto End; // To zakończenie jest otwarte na “E_note_tab_U_ignore_change”, ale też na inne błędy (czasowe) i dlatego powoduje brak determinizmu zaznaczania.
     GtkCellRenderer *renderer = ( void * )note_tab_ext_data->tree_renderer_text[ ( void * )widget == note_tab_ext_data->tree[ E_note_tab_Q_ext_data_Z_tree_S_books ] ? E_note_tab_Q_ext_data_Z_tree_S_books : E_note_tab_Q_ext_data_Z_tree_S_notes ];
     gboolean editing;
     g_object_get( renderer, "editing", &editing, null );
