@@ -47,14 +47,14 @@
 #define yes     true
 #define empty   ( ~zero )
 #define null    (( void * ) 0 )
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 #define J_swap(type,a,b)    ({ type tmp = a; a = b; b = tmp; })
 #define J_order(type,a,b)   if( a > b ){ J_swap(type,a,b); }
 #define J_max(a,b)          ( (a) < (b) ? (b) : (a) )
 #define J_min(a,b)          ( (a) > (b) ? (b) : (a) )
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 typedef N bool;
-//=============================================================================
+//==============================================================================
 // Musi być ta nazwa dla ‘native’, ponieważ ‟gtk+” wykonuje wymagane mechanizmy wewnętrzne podczas obsługi ‘drag & drop’.
 #define E_dnd_Q_tree_Z_data_type_S_native_S_atom_name "GTK_TREE_MODEL_ROW"
 #define E_dnd_Q_tree_Z_data_type_S_text_S_atom_name "UTF8_STRING"

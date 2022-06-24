@@ -130,7 +130,7 @@ E_main_Z_gtk_Q_program_I_about( GSimpleAction *action
     g_free( s_lgpl );
     gtk_show_about_dialog( E_main_Q_window_S
     , "program-name", "ouxy notepad"
-    , "version", "0.16.0.2 (" __DATE__ ")"
+    , "version", "0.16.1.0 (" __DATE__ ")"
     , "comments", "where an infinity ends or begins…"
     , "copyright", "©2013‐2022 overcq"
     , "authors", ( char *[] ){ "ocq@tutanota.com (overcq)", null }
