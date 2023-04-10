@@ -5,7 +5,7 @@ PHONY_TARGETS := build rebuild run dist-1 dist-2 dist-3 dist-4 clean clean-dist
 OTHER_TARGETS := $(filter-out $(PHONY_TARGETS),$(MAKECMDGOALS))
 .DEFAULT: build
 build:
-	scons -j 4 $(OTHER_TARGETS)
+	scons -j 2 $(OTHER_TARGETS)
 rebuild: clean build
 run:
 	cd .build && ./notepad
