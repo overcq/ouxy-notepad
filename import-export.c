@@ -357,11 +357,18 @@ E_ie_Q_xml_file_I_import_I_tree_I_note( GDataInputStream *in
         s = E_ie_I_read_string( in, no );
         if(s)
         {   if( *s )
-            {   char *s_ = g_regex_replace_eval( E_ie_Q_re, s, -1, 0, 0, E_string_Z_gtk_I_eval_I_replace_from_entities, null, null );
+            {   GString *str = g_string_new(s);
+                if( g_string_replace( str, "<br/>", "\n", 0 ))
+                {   g_free(s);
+                    s = g_string_free_and_steal(str);
+                }else
+                    g_string_free( str, TRUE );
+                char *s_ = g_regex_replace_eval( E_ie_Q_re, s, -1, 0, 0, E_string_Z_gtk_I_eval_I_replace_from_entities, null, null );
                 g_free(s);
                 s = g_strconcat( s_, "\n", null );
                 g_free( s_ );
-            }
+            }else
+                g_free(s);
             success = yes;
         }
     }else
@@ -773,6 +780,12 @@ E_ie_Q_xml_file_I_export_I_tree_I_note( GDataOutputStream *out
     g_strchomp(t);
     char *t_ = g_regex_replace_eval( E_ie_Q_re, t, -1, 0, 0, E_string_Q_xml_Z_gtk_I_eval_I_replace_to_entities, null, null );
     g_free(t);
+    GString *str = g_string_new( t_ );
+    if( g_string_replace( str, "\n", "<br/>", 0 ))
+    {   g_free( t_ );
+        t_ = g_string_free_and_steal(str);
+    }else
+        g_string_free( str, TRUE );
     t = t_;
     g_string_append( s, t );
     g_free(t);
