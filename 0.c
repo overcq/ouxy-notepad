@@ -132,7 +132,7 @@ E_main_Z_gtk_Q_program_I_about( GSimpleAction *action
     , "program-name", "ouxy notepad"
     , "version", "0.16.1.1 (" __DATE__ ")"
     , "comments", "where an infinity ends or begins…"
-    , "copyright", "©2013‐2024 overcq"
+    , "copyright", "©2013‐2025 overcq"
     , "authors", ( char *[] ){ "overcq@int.pl (overcq)", null }
     , "license", s_licence
     , null
