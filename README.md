@@ -28,7 +28,7 @@ Creating and searching for notes (Unicode) organized in the structures of note t
 
 ## 5. Risk
 
-You must ensure the security of the hierarchical database stored in the user's home directory in the "notepad-ocq" file and in the ".#notepad-ocq.\~”number“\~" backup files.
+You must ensure the security of the hierarchical database stored in the userʼs home directory in the “notepad-ocq” file and in the “.#notepad-ocq.\~”number“\~” backup files.
 
 ## 6. Component materials
 
@@ -37,7 +37,7 @@ This product uses external libraries (source code available through the operatin
 * “libc”
 * Gtk+ 3
 
-This product has been built using unix-like tools, in particular:
+This product has been built using unix‐like tools, in particular:
 
 * “clang”
 * GNU “make”
